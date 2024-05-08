@@ -52,7 +52,7 @@
     "report-dir": "./coverage"
   },
   "peerDependencies": {
-    "@gofynd/fdk-client-javascript": "^1.1.0"
+    "@gofynd/fdk-client-javascript": "1.4.3"
   },
   "name": "@gofynd/fdk-extension-javascript",
   "description": "FDK Extension Helper Library",
