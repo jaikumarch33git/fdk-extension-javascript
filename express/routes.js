@@ -20,12 +20,14 @@ function setupRoutes(ext) {
         // ?company_id=1&client_id=123313112122
         try {
             let companyId = parseInt(req.query.company_id);
+            console.log("companyId")
             let platformConfig = await ext.getPlatformConfig(companyId);
+            console.log("platformConfig", platformConfig)
             let session;
             let redirectPath = req.query.redirect_path;
-
+            
             session = new Session(Session.generateSessionId(true));
-
+            console.log("session", session)
             let sessionExpires = new Date(Date.now() + 900000); // 15 min
 
             if (session.isNew) {
@@ -57,13 +59,14 @@ function setupRoutes(ext) {
             let redirectUrl;
 
             session.state = uuidv4();
-
+            console.log("cookies", res.cookie)
             // pass application id if received
             let authCallback = ext.getAuthCallback();
+            console.log("authCallback", authCallback)
             if (req.query.application_id) {
                 authCallback += "?application_id=" + req.query.application_id;
             }
-
+            console.log("authorization flow start")
             // start authorization flow 
             redirectUrl = platformConfig.oauthClient.startAuthorization({
                 scope: session.scope,
@@ -71,10 +74,14 @@ function setupRoutes(ext) {
                 state: session.state,
                 access_mode: 'online' // Always generate online mode token for extension launch
             });
+            console.log("authorization flow end")
+            console.log("redirectUrl",redirectUrl)
+            console.log("session 2",session)
             await SessionStorage.saveSession(session);
             logger.debug(`Redirecting after install callback to url: ${redirectUrl}`);
             res.redirect(redirectUrl);
         } catch (error) {
+            console.log("error", error)
             next(error);
         }
     });
