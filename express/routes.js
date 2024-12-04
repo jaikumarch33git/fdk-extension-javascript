@@ -78,17 +78,21 @@ function setupRoutes(ext) {
             console.log("redirectUrl",redirectUrl)
             console.log("session 2",session)
             await SessionStorage.saveSession(session);
+            console.log("fp install redirect start",redirectUrl )
             logger.debug(`Redirecting after install callback to url: ${redirectUrl}`);
             res.redirect(redirectUrl);
+            console.log("fp install redirect end",redirectUrl )
         } catch (error) {
             console.log("error", error)
             next(error);
         }
+        console.log("fp install over")
     });
 
     FdkRoutes.get("/fp/auth", sessionMiddleware(false), async (req, res, next) => {
         // ?code=ddjfhdsjfsfh&client_id=jsfnsajfhkasf&company_id=1&state=jashoh
         try {
+            console.log("Fp auth")
             if (!req.fdkSession) {
                 throw new FdkSessionNotFoundError("Can not complete oauth process as session not found");
             }
@@ -100,14 +104,14 @@ function setupRoutes(ext) {
 
             const platformConfig = await ext.getPlatformConfig(req.fdkSession.company_id);
             await platformConfig.oauthClient.verifyCallback(req.query);
-
+            console.log("Fp auth oauth verifycallback")
             let token = platformConfig.oauthClient.raw_token;
             let sessionExpires = new Date(Date.now() + token.expires_in * 1000);
 
             req.fdkSession.expires = sessionExpires;
             token.access_token_validity = sessionExpires.getTime();
             req.fdkSession.updateToken(token);
-
+            
             await SessionStorage.saveSession(req.fdkSession);
 
             // Generate separate access token for offline mode
@@ -159,11 +163,15 @@ function setupRoutes(ext) {
                 redirectUrl = req.fdkSession.redirect_path;
             }
             logger.debug(`Redirecting after auth callback to url: ${redirectUrl}`);
+            console.log("fp auth redirect start",redirectUrl )
             res.redirect(redirectUrl);
+            console.log("fp auth redirect finished")
         } catch (error) {
+            console.log("Fp auth error", error)
             logger.error(error);
             next(error);
         }
+        console.log("fp auth finished")
     });
 
 
