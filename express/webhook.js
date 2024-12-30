@@ -388,7 +388,7 @@ class WebhookRegistry {
 
             if (typeof extHandler === 'function') {
                 logger.debug(`Webhook event received for company: ${req.body.company_id}, application: ${req.body.application_id || ''}, event name: ${eventName}`);
-                await extHandler(eventName, req.body, req.body.company_id, req.body.application_id);
+                await extHandler(eventName, req.body, req.body.company_id, req.body.application_id,req);
             }
             else {
                 throw new FdkWebhookHandlerNotFound(`Webhook handler not assigned: ${eventName}`);
